@@ -198,6 +198,7 @@ class Aoe_Profiler_Block_Profiler extends Mage_Core_Block_Abstract {
 
 
 		$output .= '<div id="profiler"><h1>'.($this->getTitle() ?:'Profiler').'</h1>';
+		$output .= $this->renderRequestDetails();
 
 		$hideLinesFasterThan = intval(Mage::getStoreConfig('dev/debug/hideLinesFasterThan'));
 
@@ -219,6 +220,76 @@ class Aoe_Profiler_Block_Profiler extends Mage_Core_Block_Abstract {
 		$output .= '<script type="text/javascript">'.Mage::helper('aoe_profiler')->getSkinFileContent('aoe_profiler/js/profiler.js').'</script>';
 
 		return $output;
+	}
+
+	protected function renderRequestDetails()
+	{
+		$detail = array();
+		$notAvailable = '--';
+
+		// Add request time
+		if (isset($_SERVER['REQUEST_TIME_FLOAT'])) {
+			$detail['time_elapsed'] = sprintf('%f', microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']);
+		} else {
+			$detail['time_elapsed'] = sprintf('%d', time() - $_SERVER['REQUEST_TIME']);
+		}
+
+		foreach (array('REQUEST_METHOD', 'REQUEST_URI', 'HTTP_USER_AGENT') as $key) {
+			if (!empty($_SERVER[$key])) {
+				$detail[$key] = $_SERVER[$key];
+			} else {
+				$detail[$key] = $notAvailable;
+			}
+		}
+
+		if ($detail['REQUEST_METHOD'] == $notAvailable) {
+			$detail['REQUEST_METHOD'] = php_sapi_name();
+		}
+		if ($detail['REQUEST_URI'] == $notAvailable && isset($_SERVER['PHP_SELF'])) {
+			$detail['REQUEST_URI'] = $_SERVER['PHP_SELF'];
+		}
+		if ($detail['REQUEST_URI'] == $this->getTitle()) {
+			unset($detail['REQUEST_URI']);
+		}
+
+		// Fetch request data
+		$requestData = array();
+		if (!empty($_GET)) {
+			$requestData[] = '  GET|'.substr(@json_encode($_GET), 0, 1000);
+		}
+		if (!empty($_POST)) {
+			$requestData[] = '  POST|'.substr(@json_encode($_POST), 0, 1000);
+		}
+		if (!empty($_FILES)) {
+			$requestData[] = '  FILES|'.substr(@json_encode($_FILES), 0, 1000);
+		}
+		if (Mage::registry('raw_post_data')) {
+			$requestData[] = '  RAWPOST|'.substr(Mage::registry('raw_post_data'), 0, 1000);
+		}
+		$detail['REQUEST_DATA'] = $requestData ? implode("\n", $requestData) : $notAvailable;
+
+
+		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			$detail['REMOTE_ADDR'] = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} elseif (!empty($_SERVER['REMOTE_ADDR'])) {
+			$detail['REMOTE_ADDR'] = $_SERVER['REMOTE_ADDR'];
+		} else {
+			$detail['REMOTE_ADDR'] = $notAvailable;
+		}
+
+		// Add hostname to log message ...
+		if (gethostname() !== false) {
+			$detail['HOSTNAME'] = gethostname();
+		} else {
+			$detail['HOSTNAME'] = 'Could not determine hostname!';
+		}
+
+		$html = '<ul>';
+		foreach ($detail as $key => $value) {
+			$html .= "<li><strong>$key:</strong>".$this->escapeHtml($value)."</li>";
+		}
+		$html .= '</ul>';
+		return $html;
 	}
 
 	/**
