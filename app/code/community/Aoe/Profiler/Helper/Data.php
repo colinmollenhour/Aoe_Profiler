@@ -59,11 +59,20 @@ class Aoe_Profiler_Helper_Data extends Mage_Core_Helper_Abstract {
 		$head->addJs('scriptaculous/dragdrop.js');
 		$head->addJs('scriptaculous/controls.js');
 		$head->addJs('scriptaculous/slider.js');
-		$head->addJs('mage/translate.js');
 		$profilerBlock = Mage::app()->getLayout()->createBlock('core/profiler');
 		$profilerBlock->setTitle($title);
 		$profilerBlock->setForceRender(TRUE);
-		$content = "<html><head>{$head->toHtml()}</head><body>{$profilerBlock->toHtml()}</body></html>";
+		$content = <<<HTML
+<html>
+<head>
+    <title>{$head->getTitle()}</title>
+    {$head->getCssJsHtml()}
+</head>
+<body>
+{$profilerBlock->toHtml()}
+</body>
+</html>
+HTML;
 
 		// Save HTML to file
 		$profileDir = Mage::getStoreConfig(self::XML_PATH_PROFILE_DIR,0) ?: Mage::getBaseDir('var') . DS . 'profile';
