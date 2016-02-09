@@ -51,22 +51,15 @@ class Aoe_Profiler_Helper_Data extends Mage_Core_Helper_Abstract {
 		// Render HTML
 		Mage::getDesign()->setArea('frontend');
 		Mage::app()->getLayout()->setArea('frontend');
-		$head = Mage::app()->getLayout()->createBlock('adminhtml/page_head'); /* @var $head Mage_Page_Block_Html_Head */
-		$head->setTitle($title);
-		$head->addJs('prototype/prototype.js');
-		$head->addJs('scriptaculous/builder.js');
-		$head->addJs('scriptaculous/effects.js');
-		$head->addJs('scriptaculous/dragdrop.js');
-		$head->addJs('scriptaculous/controls.js');
-		$head->addJs('scriptaculous/slider.js');
 		$profilerBlock = Mage::app()->getLayout()->createBlock('core/profiler');
 		$profilerBlock->setTitle($title);
 		$profilerBlock->setForceRender(TRUE);
 		$content = <<<HTML
 <html>
 <head>
-    <title>{$head->getTitle()}</title>
-    {$head->getCssJsHtml()}
+    <title>$title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/prototype/1.7.3.0/prototype.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js"></script>
 </head>
 <body>
 {$profilerBlock->toHtml()}
