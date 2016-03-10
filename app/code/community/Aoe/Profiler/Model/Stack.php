@@ -84,6 +84,9 @@ class Aoe_Profiler_Model_Stack extends Mage_Core_Model_Abstract {
 	protected function calcRelativeValues() {
 		foreach ($this->stackLog as $key => $value) {
 			foreach ($this->metrics as $metric) {
+				if ($this->stackLog['timetracker_0'][$metric.'_total'] == 0) { // Fix division by 0
+					$this->stackLog['timetracker_0'][$metric.'_total'] = 0.000000001;
+				}
 				foreach (array('own', 'sub', 'total') as $column) {
 					if (!isset($this->stackLog[$key][$metric.'_'.$column])) {
 						continue;
