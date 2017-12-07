@@ -211,7 +211,7 @@ class Aoe_Profiler_Block_Profiler extends Mage_Core_Block_Abstract {
 		$output .= $this->renderHeader();
 
 		$output .= '<ul id="treeView" class="treeView">';
-			$output .= $this->renderTree($this->treeData);
+			$output .= $this->renderTree($this->treeData ?: []);
 		$output .= '</ul>';
 
 		$output .= '</div>';
