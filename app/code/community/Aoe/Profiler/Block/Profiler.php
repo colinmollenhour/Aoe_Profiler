@@ -325,6 +325,7 @@ class Aoe_Profiler_Block_Profiler extends Mage_Core_Block_Abstract {
 					</div>';
 		$captions .= '<div class="profiler-columns">';
 		foreach ($this->metrics as $metric) {
+		    if (empty($this->stackLog['timetracker_0'])) continue;
 			$formatterMethod = 'format_'.$metric;
 			$captions .= '<div class="metric">';
 				$captions .= '<div class="profiler-column3">';
