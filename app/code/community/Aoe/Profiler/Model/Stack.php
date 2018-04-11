@@ -29,8 +29,10 @@ class Aoe_Profiler_Model_Stack extends Mage_Core_Model_Abstract {
 			$this->createHierarchyArray($this->treeData, $data['level'], $uniqueId);
 		}
 
-		$this->treeData = end($this->treeData);
-		$this->updateValues($this->treeData);
+		if ($this->treeData) {
+			$this->treeData = end($this->treeData);
+			$this->updateValues($this->treeData);
+		}
 
 		$this->calcRelativeValues();
 
